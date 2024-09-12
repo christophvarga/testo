@@ -7,25 +7,34 @@ const meditationTimerDisplay = document.getElementById('meditationTimer');
 const video = document.getElementById('video');
 const canvas = document.getElementById('canvas');
 const photoGallery = document.getElementById('photoGallery');
-const beepSound = document.getElementById('beepSound');
+const meditationSound = document.getElementById('meditationSound');
 
-const colors = ['#00ff00', '#ff00ff', '#00ffff', '#ffff00', '#ff0000', '#0000ff'];
-let currentColorIndex = 0;
+const themes = [
+    { background: '#003300', text: '#00ff00' },
+    { background: '#000033', text: '#00ffff' },
+    { background: '#330033', text: '#ff00ff' },
+    { background: '#333300', text: '#ffff00' },
+    { background: '#330000', text: '#ff0000' },
+    { background: '#000000', text: '#ffffff' }
+];
+let currentThemeIndex = 0;
 let photos = [];
 let facingMode = "environment";
 let currentStream;
 let meditationTimer;
 
-// Set initial color
-document.documentElement.style.setProperty('--primary-color', colors[currentColorIndex]);
-document.documentElement.style.setProperty('--text-color', colors[currentColorIndex]);
-document.documentElement.style.setProperty('--button-color', colors[currentColorIndex]);
+// Set initial theme
+setTheme(currentThemeIndex);
+
+function setTheme(index) {
+    document.documentElement.style.setProperty('--background-color', themes[index].background);
+    document.documentElement.style.setProperty('--text-color', themes[index].text);
+    document.documentElement.style.setProperty('--button-text', themes[index].text);
+}
 
 colorButton.addEventListener('click', () => {
-    currentColorIndex = (currentColorIndex + 1) % colors.length;
-    document.documentElement.style.setProperty('--primary-color', colors[currentColorIndex]);
-    document.documentElement.style.setProperty('--text-color', colors[currentColorIndex]);
-    document.documentElement.style.setProperty('--button-color', colors[currentColorIndex]);
+    currentThemeIndex = (currentThemeIndex + 1) % themes.length;
+    setTheme(currentThemeIndex);
 });
 
 function startCamera() {
@@ -101,13 +110,17 @@ meditationButton.addEventListener('click', () => {
         meditationTimer = null;
         meditationTimerDisplay.classList.add('hidden');
         meditationButton.textContent = "Meditate";
+        meditationSound.pause();
+        meditationSound.currentTime = 0;
         return;
     }
 
     const duration = parseInt(meditationDurationSelect.value, 10);
     let timeLeft = duration * 60 + 5; // 5 Sekunden Vorlauf
 
-    beepSound.play();
+    // Spiele den Ton am Anfang
+    meditationSound.play();
+
     meditationTimerDisplay.classList.remove('hidden');
 
     meditationTimer = setInterval(() => {
@@ -117,7 +130,8 @@ meditationButton.addEventListener('click', () => {
         meditationTimerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 
         if (timeLeft === duration * 60) {
-            beepSound.play(); // Beep nach Vorlauf
+            // Spiele den Ton nach dem Vorlauf erneut
+            meditationSound.play();
         }
 
         if (timeLeft <= 0) {
@@ -125,7 +139,8 @@ meditationButton.addEventListener('click', () => {
             meditationTimer = null;
             meditationTimerDisplay.classList.add('hidden');
             meditationButton.textContent = "Meditate";
-            beepSound.play();
+            // Spiele den Ton am Ende
+            meditationSound.play();
         }
     }, 1000);
 
