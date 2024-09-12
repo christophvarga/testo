@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hello World PWA</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="manifest" href="/manifest.json">
+    <link rel="stylesheet" href="./styles.css">
+    <link rel="manifest" href="./manifest.json">
     <base href="/testo/">
 </head>
 <body>
@@ -14,7 +14,7 @@
     <script src="app.js"></script>
     <script>
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js')
+            navigator.serviceWorker.register('./sw.js', { scope: './' })
                 .then(reg => console.log('Service Worker registriert', reg))
                 .catch(err => console.log('Service Worker Fehler', err));
         }
