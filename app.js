@@ -2,24 +2,30 @@ const colorButton = document.getElementById('colorButton');
 const photoButton = document.getElementById('photoButton');
 const switchCameraButton = document.getElementById('switchCameraButton');
 const meditationButton = document.getElementById('meditationButton');
-const meditationDurationSlider = document.getElementById('meditationDuration');
-const durationOutput = document.getElementById('durationOutput');
+const meditationDurationSelect = document.getElementById('meditationDuration');
 const meditationTimerDisplay = document.getElementById('meditationTimer');
 const video = document.getElementById('video');
 const canvas = document.getElementById('canvas');
 const photoGallery = document.getElementById('photoGallery');
 const beepSound = document.getElementById('beepSound');
 
-const colors = ['#4a90e2', '#50c878', '#f39c12', '#e74c3c', '#9b59b6', '#34495e'];
+const colors = ['#00ff00', '#ff00ff', '#00ffff', '#ffff00', '#ff0000', '#0000ff'];
 let currentColorIndex = 0;
 let photos = [];
 let facingMode = "environment";
 let currentStream;
 let meditationTimer;
 
+// Set initial color
+document.documentElement.style.setProperty('--primary-color', colors[currentColorIndex]);
+document.documentElement.style.setProperty('--text-color', colors[currentColorIndex]);
+document.documentElement.style.setProperty('--button-color', colors[currentColorIndex]);
+
 colorButton.addEventListener('click', () => {
     currentColorIndex = (currentColorIndex + 1) % colors.length;
     document.documentElement.style.setProperty('--primary-color', colors[currentColorIndex]);
+    document.documentElement.style.setProperty('--text-color', colors[currentColorIndex]);
+    document.documentElement.style.setProperty('--button-color', colors[currentColorIndex]);
 });
 
 function startCamera() {
@@ -89,20 +95,16 @@ function savePhotosToLocalStorage() {
     localStorage.setItem('photos', JSON.stringify(photos));
 }
 
-meditationDurationSlider.addEventListener('input', () => {
-    durationOutput.textContent = `${meditationDurationSlider.value} min`;
-});
-
 meditationButton.addEventListener('click', () => {
     if (meditationTimer) {
         clearInterval(meditationTimer);
         meditationTimer = null;
         meditationTimerDisplay.classList.add('hidden');
-        meditationButton.querySelector('span').textContent = "Meditate";
+        meditationButton.textContent = "Meditate";
         return;
     }
 
-    const duration = parseInt(meditationDurationSlider.value, 10);
+    const duration = parseInt(meditationDurationSelect.value, 10);
     let timeLeft = duration * 60 + 5; // 5 Sekunden Vorlauf
 
     beepSound.play();
@@ -122,12 +124,12 @@ meditationButton.addEventListener('click', () => {
             clearInterval(meditationTimer);
             meditationTimer = null;
             meditationTimerDisplay.classList.add('hidden');
-            meditationButton.querySelector('span').textContent = "Meditate";
+            meditationButton.textContent = "Meditate";
             beepSound.play();
         }
     }, 1000);
 
-    meditationButton.querySelector('span').textContent = "Stop";
+    meditationButton.textContent = "Stop";
 });
 
 window.addEventListener('load', () => {
