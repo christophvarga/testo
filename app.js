@@ -23,6 +23,17 @@ let facingMode = "environment";
 let currentStream;
 let meditationTimer;
 
+console.log("Meditation sound element:", meditationSound);
+
+function playSound() {
+    console.log("Attempting to play sound");
+    meditationSound.play().then(() => {
+        console.log("Sound played successfully");
+    }).catch(error => {
+        console.error("Error playing sound:", error);
+    });
+}
+
 // Set initial theme
 setTheme(currentThemeIndex);
 
@@ -112,6 +123,7 @@ meditationButton.addEventListener('click', () => {
         meditationButton.textContent = "Meditate";
         meditationSound.pause();
         meditationSound.currentTime = 0;
+        console.log("Meditation stopped");
         return;
     }
 
@@ -119,7 +131,7 @@ meditationButton.addEventListener('click', () => {
     let timeLeft = duration * 60 + 5; // 5 Sekunden Vorlauf
 
     // Spiele den Ton am Anfang
-    meditationSound.play();
+    playSound();
 
     meditationTimerDisplay.classList.remove('hidden');
 
@@ -131,7 +143,7 @@ meditationButton.addEventListener('click', () => {
 
         if (timeLeft === duration * 60) {
             // Spiele den Ton nach dem Vorlauf erneut
-            meditationSound.play();
+            playSound();
         }
 
         if (timeLeft <= 0) {
@@ -140,12 +152,24 @@ meditationButton.addEventListener('click', () => {
             meditationTimerDisplay.classList.add('hidden');
             meditationButton.textContent = "Meditate";
             // Spiele den Ton am Ende
-            meditationSound.play();
+            playSound();
         }
     }, 1000);
 
     meditationButton.textContent = "Stop";
+    console.log("Meditation started");
 });
+
+function requestPermissions() {
+    return navigator.mediaDevices.getUserMedia({ audio: true, video: true })
+        .then(stream => {
+            stream.getTracks().forEach(track => track.stop());
+            console.log("Permissions granted");
+        })
+        .catch(error => {
+            console.error("Error requesting permissions:", error);
+        });
+}
 
 window.addEventListener('load', () => {
     const savedPhotos = localStorage.getItem('photos');
@@ -153,7 +177,14 @@ window.addEventListener('load', () => {
         photos = JSON.parse(savedPhotos);
         updatePhotoGallery();
     }
-    startCamera();
+    
+    requestPermissions().then(() => {
+        startCamera();
+        
+        // Test sound playback
+        console.log("Testing sound playback");
+        playSound();
+    });
 });
 
 navigator.mediaDevices.enumerateDevices()
