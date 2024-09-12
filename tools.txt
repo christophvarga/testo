@@ -1,6 +1,6 @@
 # git push
 
-git add 404.html .nojekyll
-git commit -m "Fix 404 issue for PWA"
+git add .
+git commit -m "text"
 git push
 
